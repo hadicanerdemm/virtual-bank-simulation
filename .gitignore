@@ -1,0 +1,39 @@
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Dependencies
+/vendor/
+node_modules/
+
+# Cache
+*.cache
+.phpunit.result.cache
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Sensitive data
+*.sql.bak
+database/backups/
+
+# Debug files
+*.debug

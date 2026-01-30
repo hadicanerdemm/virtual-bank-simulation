@@ -1,0 +1,13 @@
+# TurkPay - Apache URL Rewriting
+# Enable mod_rewrite
+RewriteEngine On
+
+# Set base directory
+RewriteBase /banka/public/
+
+# If the requested file or directory exists, serve it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Otherwise, rewrite all requests to index.php
+RewriteRule ^(.*)$ index.php [QSA,L]

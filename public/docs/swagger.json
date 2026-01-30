@@ -1,0 +1,501 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "TurkPay Payment Gateway API",
+        "description": "Modern, güvenli ve kullanımı kolay sanal banka ve ödeme ağ geçidi API'si. Iyzico benzeri entegrasyon yapısı ile e-ticaret sitelerinize kolayca entegre edin.",
+        "version": "1.0.0",
+        "contact": {
+            "name": "TurkPay Destek",
+            "email": "destek@turkpay.local",
+            "url": "https://turkpay.local/docs"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost/banka/public/api/v1",
+            "description": "Geliştirme Sunucusu"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Payments",
+            "description": "Ödeme işlemleri"
+        },
+        {
+            "name": "Merchant",
+            "description": "İşletme işlemleri"
+        },
+        {
+            "name": "Exchange",
+            "description": "Döviz kurları"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "summary": "API Sağlık Kontrolü",
+                "description": "API'nin çalışır durumda olup olmadığını kontrol eder",
+                "tags": [
+                    "System"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API çalışıyor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exchange-rates": {
+            "get": {
+                "summary": "Döviz Kurları",
+                "description": "Güncel döviz kurlarını getirir",
+                "tags": [
+                    "Exchange"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "USD_TRY": {
+                                                    "type": "number",
+                                                    "example": 32.50
+                                                },
+                                                "EUR_TRY": {
+                                                    "type": "number",
+                                                    "example": 35.20
+                                                },
+                                                "USD_EUR": {
+                                                    "type": "number",
+                                                    "example": 0.92
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/initiate": {
+            "post": {
+                "summary": "Ödeme Başlat",
+                "description": "Yeni bir ödeme oturumu oluşturur ve checkout URL'i döner",
+                "tags": [
+                    "Payments"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiSecretAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentInitiateRequest"
+                            },
+                            "example": {
+                                "amount": 199.99,
+                                "currency": "TRY",
+                                "order_id": "ORDER-12345",
+                                "return_url": "https://example.com/success",
+                                "cancel_url": "https://example.com/cancel",
+                                "callback_url": "https://example.com/webhook",
+                                "customer_email": "musteri@email.com",
+                                "customer_name": "Ahmet Yılmaz"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ödeme oturumu oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentInitiateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Geçersiz istek",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Yetkilendirme hatası",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/status/{token}": {
+            "get": {
+                "summary": "Ödeme Durumu",
+                "description": "Ödeme oturumunun durumunu sorgular",
+                "tags": [
+                    "Payments"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiSecretAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "description": "Oturum token'ı",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentStatusResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Oturum bulunamadı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/refund": {
+            "post": {
+                "summary": "İade İşlemi",
+                "description": "Tamamlanmış bir ödemeyi iade eder",
+                "tags": [
+                    "Payments"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "ApiSecretAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RefundRequest"
+                            },
+                            "example": {
+                                "transaction_id": "uuid-here",
+                                "amount": 50.00,
+                                "reason": "Müşteri iade talebi"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "İade başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RefundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "İade başarısız",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-KEY",
+                "description": "Merchant API Key"
+            },
+            "ApiSecretAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-SECRET",
+                "description": "Merchant API Secret"
+            }
+        },
+        "schemas": {
+            "PaymentInitiateRequest": {
+                "type": "object",
+                "required": [
+                    "amount",
+                    "currency",
+                    "order_id",
+                    "return_url"
+                ],
+                "properties": {
+                    "amount": {
+                        "type": "number",
+                        "description": "Ödeme tutarı",
+                        "example": 199.99
+                    },
+                    "currency": {
+                        "type": "string",
+                        "enum": [
+                            "TRY",
+                            "USD",
+                            "EUR"
+                        ],
+                        "description": "Para birimi"
+                    },
+                    "order_id": {
+                        "type": "string",
+                        "description": "Mağaza sipariş numarası",
+                        "example": "ORDER-12345"
+                    },
+                    "return_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Başarılı ödeme sonrası yönlendirilecek URL"
+                    },
+                    "cancel_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "İptal sonrası yönlendirilecek URL"
+                    },
+                    "callback_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Webhook URL (opsiyonel)"
+                    },
+                    "customer_email": {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Müşteri e-postası"
+                    },
+                    "customer_name": {
+                        "type": "string",
+                        "description": "Müşteri adı"
+                    }
+                }
+            },
+            "PaymentInitiateResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "session_id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "session_token": {
+                                "type": "string"
+                            },
+                            "checkout_url": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "expires_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "amount": {
+                                "type": "number"
+                            },
+                            "currency": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "PaymentStatusResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "created",
+                                    "pending_3d",
+                                    "completed",
+                                    "failed",
+                                    "cancelled"
+                                ]
+                            },
+                            "amount": {
+                                "type": "number"
+                            },
+                            "currency": {
+                                "type": "string"
+                            },
+                            "order_id": {
+                                "type": "string"
+                            },
+                            "transaction_reference": {
+                                "type": "string"
+                            },
+                            "completed_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    }
+                }
+            },
+            "RefundRequest": {
+                "type": "object",
+                "required": [
+                    "transaction_id"
+                ],
+                "properties": {
+                    "transaction_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Orijinal işlem ID'si"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "İade tutarı (boş ise tam iade)"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "İade sebebi"
+                    }
+                }
+            },
+            "RefundResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "refund_id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "reference_id": {
+                                "type": "string"
+                            },
+                            "amount": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "error": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "string",
+                                "example": "VALIDATION_ERROR"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Invalid request"
+                            },
+                            "details": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
