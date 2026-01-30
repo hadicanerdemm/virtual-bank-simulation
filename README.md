@@ -131,7 +131,7 @@ TurkPay is a full-stack financial technology simulation platform that emulates c
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@turkpay.com | password |
+| Admin | admin@turkpay.com | 1234 |
 | Demo User | Register new account | - |
 
 ---
@@ -260,26 +260,14 @@ This project demonstrates practical implementation of several computer science a
 
 ---
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
 
 ## 👤 Author
 
-**[Your Name]**
+**HADİCAN ERDEM**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-
----
-
-## 🙏 Acknowledgments
-
-- Modern UI design inspired by contemporary fintech applications
-- Security patterns based on OWASP guidelines
-- Financial transaction patterns following industry standards
+- GitHub: [@hadicanerdemm](https://github.com/hadicanerdemm)
+- LinkedIn: [Hadican Erdem](https://www.linkedin.com/in/hadican-erdem-a6a69b389/)
 
 ---
 
